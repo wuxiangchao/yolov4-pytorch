@@ -17,7 +17,7 @@ from nets.yolo4 import YoloBody
 
 
 #---------------------------------------------------#
-#   获得类和先验框
+#   Get classes and anchors
 #---------------------------------------------------#
 def get_classes(classes_path):
     '''loads the classes'''
@@ -96,11 +96,12 @@ def fit_ont_epoch(net,yolo_losses,epoch,epoch_size,epoch_size_val,gen,genval,Epo
 
 if __name__ == "__main__":
     #-------------------------------#
-    #   输入的shape大小
+    #   input shape of image
     #   显存比较小可以使用416x416
     #   显存比较大可以使用608x608
     #-------------------------------#
     input_shape = (416,416)
+    print("Test")
     #-------------------------------#
     #   tricks的使用设置
     #-------------------------------#
@@ -119,11 +120,11 @@ if __name__ == "__main__":
     #   获得先验框和类
     #-------------------------------#
     anchors_path = 'model_data/yolo_anchors.txt'
-    classes_path = 'model_data/voc_classes.txt'   
+    classes_path = 'model_data/voc_classes.txt'
     class_names = get_classes(classes_path)
     anchors = get_anchors(anchors_path)
     num_classes = len(class_names)
-    
+
     # 创建模型
     model = YoloBody(len(anchors[0]),num_classes)
     model_path = "model_data/yolo4_weights.pth"
@@ -159,13 +160,13 @@ if __name__ == "__main__":
     np.random.seed(None)
     num_val = int(len(lines)*val_split)
     num_train = len(lines) - num_val
-    
+
     if True:
         lr = 1e-3
         Batch_size = 4
         Init_Epoch = 0
         Freeze_Epoch = 25
-        
+
         optimizer = optim.Adam(net.parameters(),lr,weight_decay=5e-4)
         if Cosine_lr:
             lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=5, eta_min=1e-5)
@@ -177,7 +178,7 @@ if __name__ == "__main__":
             val_dataset = YoloDataset(lines[num_train:], (input_shape[0], input_shape[1]), mosaic=False)
             gen = DataLoader(train_dataset, batch_size=Batch_size, num_workers=8, pin_memory=True,
                                     drop_last=True, collate_fn=yolo_dataset_collate)
-            gen_val = DataLoader(val_dataset, batch_size=Batch_size, num_workers=8,pin_memory=True, 
+            gen_val = DataLoader(val_dataset, batch_size=Batch_size, num_workers=8,pin_memory=True,
                                     drop_last=True, collate_fn=yolo_dataset_collate)
         else:
             gen = Generator(Batch_size, lines[:num_train],
@@ -214,7 +215,7 @@ if __name__ == "__main__":
             val_dataset = YoloDataset(lines[num_train:], (input_shape[0], input_shape[1]), mosaic=False)
             gen = DataLoader(train_dataset, batch_size=Batch_size, num_workers=8, pin_memory=True,
                                     drop_last=True, collate_fn=yolo_dataset_collate)
-            gen_val = DataLoader(val_dataset, batch_size=Batch_size, num_workers=8,pin_memory=True, 
+            gen_val = DataLoader(val_dataset, batch_size=Batch_size, num_workers=8,pin_memory=True,
                                     drop_last=True, collate_fn=yolo_dataset_collate)
         else:
             gen = Generator(Batch_size, lines[:num_train],
